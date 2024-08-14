@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '../index.css'; 
-
+import '../index.css';
 
 function TransactionManagement() {
-
   const getSavedData = (key) => {
     const savedData = localStorage.getItem(key);
     return savedData ? JSON.parse(savedData) : [];
   };
+
   const [transactions, setTransactions] = useState(getSavedData('transactions'));
   const [editId, setEditId] = useState(null);
   const [entry, setEntry] = useState({
@@ -19,11 +17,21 @@ function TransactionManagement() {
     description: '',
   });
 
-  
-
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
+    updateSummary();
   }, [transactions]);
+
+  const updateSummary = () => {
+    const income = transactions
+      .filter(t => t.type === 'income')
+      .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    const expenses = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    localStorage.setItem('income', JSON.stringify(income));
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  };
 
   useEffect(() => {
     if (editId !== null) {
@@ -42,7 +50,7 @@ function TransactionManagement() {
       setEditId(null);
     } else {
       const newTransaction = { ...entry, id: Date.now() };
-      setTransactions([...transactions, newTransaction]);
+      setTransactions([newTransaction, ...transactions]);
     }
     setEntry({ type: '', amount: '', category: '', date: '', description: '' });
   };
@@ -75,21 +83,49 @@ function TransactionManagement() {
           </label>
           <label>
             Amount:
-            <input type="number" name="amount" required value={entry.amount} onChange={handleChange} placeholder="Amount" />
+            <input
+              type="number"
+              name="amount"
+              required
+              value={entry.amount}
+              onChange={handleChange}
+              placeholder="Amount"
+            />
           </label>
           <label>
             Category:
-            <input type="text" name="category" required value={entry.category} onChange={handleChange} placeholder="Category" />
+            <input
+              type="text"
+              name="category"
+              required
+              value={entry.category}
+              onChange={handleChange}
+              placeholder="Category"
+            />
           </label>
           <label>
             Date:
-            <input type="date" name="date"  required value={entry.date} onChange={handleChange} />
+            <input
+              type="date"
+              name="date"
+              required
+              value={entry.date}
+              onChange={handleChange}
+            />
           </label>
           <label>
             Description:
-            <textarea name="description" required value={entry.description} onChange={handleChange} placeholder="Description"></textarea>
+            <textarea
+              name="description"
+              required
+              value={entry.description}
+              onChange={handleChange}
+              placeholder="Description"
+            ></textarea>
           </label>
-          <button type="submit">{editId ? 'Update' : 'Add'} Transaction</button>
+          <button type="submit">
+            {editId ? 'Update' : 'Add'} Transaction
+          </button>
         </form>
       </div>
       <div className="list-container">
@@ -97,7 +133,10 @@ function TransactionManagement() {
         <ul>
           {transactions.map(t => (
             <li key={t.id}>
-              <p>{t.type}: ${t.amount} - {t.category} on {t.date} - {t.description}</p>
+              <p>
+                {t.type}: ${t.amount} - {t.category} on {t.date} -{' '}
+                {t.description}
+              </p>
               <button onClick={() => handleEdit(t.id)}>Edit</button>
               <button onClick={() => handleDelete(t.id)}>Delete</button>
             </li>

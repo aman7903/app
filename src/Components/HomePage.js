@@ -11,28 +11,36 @@ function HomePage() {
     return savedData ? JSON.parse(savedData) : 0;
   };
 
-  const [income, setIncome] = useState(getSavedData('income'));
-  const [expenses, setExpenses] = useState(getSavedData('expenses'));
+  const [manualIncome, setManualIncome] = useState(getSavedData('manualIncome'));
+  const [manualExpenses, setManualExpenses] = useState(getSavedData('manualExpenses'));
+  const [transactionIncome, setTransactionIncome] = useState(getSavedData('income'));
+  const [transactionExpenses, setTransactionExpenses] = useState(getSavedData('expenses'));
   const [balance, setBalance] = useState(getSavedData('balance'));
 
   useEffect(() => {
-    
-    localStorage.setItem('income', JSON.stringify(income));
-    localStorage.setItem('expenses', JSON.stringify(expenses));
-    localStorage.setItem('balance', JSON.stringify(balance));
-  }, [income, expenses, balance]);
+    const totalIncome = manualIncome + transactionIncome;
+    const totalExpenses = manualExpenses + transactionExpenses;
+    const calculatedBalance = totalIncome - totalExpenses;
+    setBalance(calculatedBalance);
+
+    localStorage.setItem('balance', JSON.stringify(calculatedBalance));
+    localStorage.setItem('manualIncome', JSON.stringify(manualIncome));
+    localStorage.setItem('manualExpenses', JSON.stringify(manualExpenses));
+  }, [manualIncome, manualExpenses, transactionIncome, transactionExpenses]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setBalance(income - expenses);
+    const totalIncome = manualIncome + transactionIncome;
+    const totalExpenses = manualExpenses + transactionExpenses;
+    setBalance(totalIncome - totalExpenses);
   };
 
   const data = {
     labels: ['Income', 'Expenses', 'Balance'],
     datasets: [
       {
-        label: 'Amount',
-        data: [income, expenses, balance],
+        label: 'Chart',
+        data: [manualIncome + transactionIncome, manualExpenses + transactionExpenses, balance],
         backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
         borderColor: ['#388e3c', '#d32f2f', '#f57c00'],
         borderWidth: 1,
@@ -54,19 +62,19 @@ function HomePage() {
         <div className="form-balance">
           <form onSubmit={handleSubmit}>
             <label>
-              Total Income:
+              Manual Income:
               <input
                 type="number"
-                value={income}
-                onChange={(e) => setIncome(Number(e.target.value))}
+                value={manualIncome}
+                onChange={(e) => setManualIncome(Number(e.target.value))}
               />
             </label>
             <label>
-              Total Expenses:
+              Manual Expenses:
               <input
                 type="number"
-                value={expenses}
-                onChange={(e) => setExpenses(Number(e.target.value))}
+                value={manualExpenses}
+                onChange={(e) => setManualExpenses(Number(e.target.value))}
               />
             </label>
             <button type="submit">Calculate Balance</button>
@@ -74,9 +82,9 @@ function HomePage() {
         </div>
         <div className="summary">
           <h3>Summary</h3>
-          <p>Income: ${income}</p>
-          <p>Expenses: ${expenses}</p>
-          <p>Balance: ${balance}</p>
+          <p style={{fontWeight:"bold"}}>Total Income: <span style={{color:'green'}}>${manualIncome + transactionIncome}</span></p>
+          <p style={{fontWeight:"bold"}}>Total Expenses: <span style={{color:'red'}}>${manualExpenses + transactionExpenses}</span></p>
+          <p style={{fontWeight:"bold"}}>Balance: ${balance}</p>
         </div>
       </div>
       <div className="chart-container">
