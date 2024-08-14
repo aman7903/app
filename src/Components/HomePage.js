@@ -39,7 +39,7 @@ function HomePage() {
     labels: ['Income', 'Expenses', 'Balance'],
     datasets: [
       {
-        label: 'Chart',
+        label: 'Amount',
         data: [manualIncome + transactionIncome, manualExpenses + transactionExpenses, balance],
         backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
         borderColor: ['#388e3c', '#d32f2f', '#f57c00'],
