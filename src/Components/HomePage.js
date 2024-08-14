@@ -62,7 +62,7 @@ function HomePage() {
         <div className="form-balance">
           <form onSubmit={handleSubmit}>
             <label>
-              Manual Income:
+              Total Income:
               <input
                 type="number"
                 value={manualIncome}
@@ -70,7 +70,7 @@ function HomePage() {
               />
             </label>
             <label>
-              Manual Expenses:
+              Total Expense:
               <input
                 type="number"
                 value={manualExpenses}
